@@ -1,14 +1,10 @@
 *
 !setup.cfg
-!*.dat
-!*.h5
 !*.ico
 !*.inf
 !*.keep
 !*.md
-!*.npy
 !*.nsi
-!*.pb
 !*.png
 !*.py
 !*.txt
@@ -28,8 +24,10 @@
 !plugins/*
 !plugins/extract/*
 !plugins/train/*
+!plugins/convert/*
 !tools
 !tools/lib*
+!.travis.yml
 *.ini
 *.pyc
 __pycache__/

@@ -62,13 +62,13 @@ class QueueManager():
         del self.queues[name]
         logger.debug("QueueManager deleted: '%s'", name)
 
-    def get_queue(self, name, maxsize=0):
+    def get_queue(self, name, maxsize=0, multiprocessing_queue=True):
         """ Return a queue from the manager
             If it doesn't exist, create it """
         logger.debug("QueueManager getting: '%s'", name)
         queue = self.queues.get(name, None)
         if not queue:
-            self.add_queue(name, maxsize)
+            self.add_queue(name, maxsize, multiprocessing_queue)
             queue = self.queues[name]
         logger.debug("QueueManager got: '%s'", name)
         return queue
@@ -78,12 +78,24 @@ class QueueManager():
             To be called if there is an error """
         logger.debug("QueueManager terminating all queues")
         self.shutdown.set()
+        self.flush_queues()
         for q_name, queue in self.queues.items():
             logger.debug("QueueManager terminating: '%s'", q_name)
-            while not queue.empty():
-                queue.get(True, 1)
             queue.put("EOF")
         logger.debug("QueueManager terminated all queues")
+
+    def flush_queues(self):
+        """ Empty out all queues """
+        for q_name in self.queues.keys():
+            self.flush_queue(q_name)
+        logger.debug("QueueManager flushed all queues")
+
+    def flush_queue(self, q_name):
+        """ Empty out a specific queue """
+        logger.debug("QueueManager flushing: '%s'", q_name)
+        queue = self.queues[q_name]
+        while not queue.empty():
+            queue.get(True, 1)
 
     def debug_monitor(self, update_secs=2):
         """ Debug tool for monitoring queues """
